@@ -1,8 +1,4 @@
-*
-!*.cpp
-!*.md
-!*.png
-!*.rs
-!.gitignore
-!cpp
-!resources
+sublime
+.cargo
+src/*
+!src/*.rs
