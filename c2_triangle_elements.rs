@@ -9,12 +9,7 @@ use vec::raw::to_ptr;
 
 use glcore::*;
 
-/* applies a type cast to an array of values */
-macro_rules! map_cast(
-    (~[$($elems:expr),+] : $T:ty) => (~[$($elems as $T),+]);
-    (@[$($elems:expr),+] : $T:ty) => (@[$($elems as $T),+]);
-    ($arr:expr : $T:ty)           => ($arr.map(|a| *a as $T));
-)
+fn macros() { include!("macros.rs"); }
 
 fn main() {
     do task::task().sched_mode(task::PlatformThread).spawn {
