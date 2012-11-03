@@ -178,7 +178,7 @@ fn main() {
                 }
                 
                 None => {
-                    io::println(~"Failed to load texture.");
+                    io::println(~"Failed to load kitten.");
                     kitten_loaded = false;
                 }
             }
@@ -210,7 +210,7 @@ fn main() {
                 }
                 
                 None => {
-                    io::println(~"Failed to load texture.");
+                    io::println(~"Failed to load puppy.");
                     puppy_loaded = false;
                 }
             }
