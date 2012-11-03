@@ -1,5 +1,8 @@
 *
-!*.rs
+!*.cpp
 !*.md
+!*.png
+!*.rs
 !.gitignore
 !cpp
+!resources
