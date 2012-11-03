@@ -24,7 +24,7 @@ fn main() {
             fail(~"glfwInit() failed\n");
         }
         
-        // OS X 10.7+ only supports the 3.2 forward compatible core profile
+        // Choose a GL profile that is compatible with OS X 10.7+
         glfw3::window_hint(glfw3::OPENGL_VERSION_MAJOR, 3);
         glfw3::window_hint(glfw3::OPENGL_VERSION_MINOR, 2);
         glfw3::window_hint(glfw3::OPENGL_PROFILE, glfw3::OPENGL_CORE_PROFILE);
