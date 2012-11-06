@@ -9,7 +9,7 @@ use sys::size_of;
 use vec::raw::to_ptr;
 
 use glcore::*;
-use stb_image::image::load;
+use stb_image::image::load_with_depth;
 
 fn macros() { include!("macros.rs"); }
 
@@ -154,7 +154,7 @@ fn main() {
         
         let kitten_loaded: bool;
         unsafe {
-            let stb_result = load(~"resources/sample.png");
+            let stb_result = load_with_depth(~"resources/sample.png", 3);
             match stb_result {
                 Some(image) => {
                     glActiveTexture(GL_TEXTURE0);
@@ -163,10 +163,10 @@ fn main() {
                     glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texKitten", |s| s)), 0);
                     
                     glTexImage2D(GL_TEXTURE_2D, 0,
-                                 GL_RGBA as GLint,          // rust-stb-image forces a bit-depth of 4
+                                 GL_RGB as GLint,
                                  image.width as GLsizei,
                                  image.height as GLsizei,
-                                 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                                 0, GL_RGB, GL_UNSIGNED_BYTE,
                                  transmute(to_ptr(image.data)));
                     
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
@@ -186,7 +186,7 @@ fn main() {
         
         let puppy_loaded: bool;
         unsafe {
-            let stb_result = load(~"resources/sample2.png");
+            let stb_result = load_with_depth(~"resources/sample2.png", 3);
             match stb_result {
                 Some(image) => {
                     glActiveTexture(GL_TEXTURE1);
@@ -195,10 +195,10 @@ fn main() {
                     glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texPuppy", |s| s)), 1);
                     
                     glTexImage2D(GL_TEXTURE_2D, 0,
-                                 GL_RGBA as GLint,          // rust-stb-image forces a bit-depth of 4
+                                 GL_RGB as GLint,
                                  image.width as GLsizei,
                                  image.height as GLsizei,
-                                 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                                 0, GL_RGB, GL_UNSIGNED_BYTE,
                                  transmute(to_ptr(image.data)));
                     
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
