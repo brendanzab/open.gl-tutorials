@@ -65,10 +65,10 @@ fn main() {
         let ebo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&ebo));
         
-        let elements = map_cast!([
+        let elements: [GLuint*6] = [
             0, 1, 2,
             2, 3, 0
-        ]: GLuint);
+        ];
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         unsafe {
