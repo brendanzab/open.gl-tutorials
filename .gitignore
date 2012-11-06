@@ -2,3 +2,4 @@ sublime
 .cargo
 src/*
 !src/*.rs
+!src/resources
