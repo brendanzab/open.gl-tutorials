@@ -1,7 +1,7 @@
 extern mod glfw3;
 extern mod glcore;
 
-use cast::{reinterpret_cast, transmute};
+use cast::transmute;
 use ptr::{is_null, null, to_unsafe_ptr};
 use str::as_c_str;
 use sys::size_of;
@@ -111,7 +111,7 @@ fn main() {
         unsafe {
             glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE,
                                   5 * size_of::<GLfloat>() as GLsizei,
-                                  reinterpret_cast(&(2 * size_of::<GLfloat>() as uint)));
+                                  transmute(2 * size_of::<GLfloat>() as uint));
         }
         
         while window.get_param(glfw3::CLOSE_REQUESTED) == 0 {
