@@ -65,7 +65,7 @@ fn main() {
         let ebo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&ebo));
         
-        let elements = map_cast!(~[
+        let elements = map_cast!([
             0, 1, 2,
             2, 3, 0
         ]: GLuint);

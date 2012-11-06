@@ -44,7 +44,7 @@ fn main() {
         let vbo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&vbo));
         
-        let vertices = map_cast!(~[
+        let vertices = map_cast!([
              0.0,  0.5,
              0.5, -0.5,
             -0.5, -0.5
