@@ -152,72 +152,72 @@ fn main() {
                                   7 * size_of::<GLfloat>() as GLsizei,
                                   transmute(5 * size_of::<GLfloat>()));
         }
-
+        
         // Load textures
         let textures: ~[GLuint] = ~[0, 0];
         unsafe { glGenTextures(2, to_ptr(textures)); }
         
         let kitten_loaded: bool;
-        unsafe {
-            let stb_result = load_with_depth(~"resources/sample.png", 3);
-            match stb_result {
-                Some(image) => {
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, textures[0]);
-                    
-                    glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texKitten", |s| s)), 0);
-                    
-                    glTexImage2D(GL_TEXTURE_2D, 0,
-                                 GL_RGB as GLint,
-                                 image.width as GLsizei,
-                                 image.height as GLsizei,
-                                 0, GL_RGB, GL_UNSIGNED_BYTE,
-                                 transmute(to_ptr(image.data)));
-                    
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
-                    
-                    kitten_loaded = true;
+        match load_with_depth(~"resources/sample.png", 3) {
+            Some(image) => {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, textures[0]);
+                
+                glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texKitten", |s| s)), 0);
+                
+                unsafe {
+                    glTexImage2D(
+                        GL_TEXTURE_2D, 0,
+                        GL_RGB as GLint,
+                        image.width as GLsizei,
+                        image.height as GLsizei,
+                        0, GL_RGB, GL_UNSIGNED_BYTE,
+                        transmute(to_ptr(image.data))
+                    );
                 }
                 
-                None => {
-                    io::println(~"Failed to load kitten.");
-                    kitten_loaded = false;
-                }
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
+                
+                kitten_loaded = true;
+            }
+            None => {
+                io::println(~"Failed to load kitten.");
+                kitten_loaded = false;
             }
         }
         
         let puppy_loaded: bool;
-        unsafe {
-            let stb_result = load_with_depth(~"resources/sample2.png", 3);
-            match stb_result {
-                Some(image) => {
-                    glActiveTexture(GL_TEXTURE1);
-                    glBindTexture(GL_TEXTURE_2D, textures[1]);
-                    
-                    glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texPuppy", |s| s)), 1);
-                    
-                    glTexImage2D(GL_TEXTURE_2D, 0,
-                                 GL_RGB as GLint,
-                                 image.width as GLsizei,
-                                 image.height as GLsizei,
-                                 0, GL_RGB, GL_UNSIGNED_BYTE,
-                                 transmute(to_ptr(image.data)));
-                    
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
-                    
-                    puppy_loaded = true;
+        match load_with_depth(~"resources/sample2.png", 3) {
+            Some(image) => {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, textures[1]);
+                
+                glUniform1i(glGetUniformLocation(shaderProgram, as_c_str("texPuppy", |s| s)), 1);
+                
+                unsafe {
+                    glTexImage2D(
+                        GL_TEXTURE_2D, 0,
+                        GL_RGB as GLint,
+                        image.width as GLsizei,
+                        image.height as GLsizei,
+                        0, GL_RGB, GL_UNSIGNED_BYTE,
+                        transmute(to_ptr(image.data))
+                    );
                 }
                 
-                None => {
-                    io::println(~"Failed to load puppy.");
-                    puppy_loaded = false;
-                }
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
+                
+                puppy_loaded = true;
+            }
+            None => {
+                io::println(~"Failed to load puppy.");
+                puppy_loaded = false;
             }
         }
         

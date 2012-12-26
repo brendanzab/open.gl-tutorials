@@ -146,33 +146,34 @@ fn main() {
         }
 
         // Load texture
+        let tex_loaded: bool;
         let tex: GLuint = 0;
         glGenTextures(1, to_unsafe_ptr(&tex));
         
-        let tex_loaded: bool;
-        unsafe {
-            let stb_result = load_with_depth(~"resources/sample.png", 3);
-            match stb_result {
-                Some(image) => {
-                    glTexImage2D(GL_TEXTURE_2D, 0,
-                                 GL_RGB as GLint,
-                                 image.width as GLsizei,
-                                 image.height as GLsizei,
-                                 0, GL_RGB, GL_UNSIGNED_BYTE,
-                                 transmute(to_ptr(image.data)));
-                    
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
-                    
-                    tex_loaded = true;
+        match load_with_depth(~"resources/sample.png", 3) {
+            Some(image) => {
+                unsafe {
+                    glTexImage2D(
+                        GL_TEXTURE_2D, 0,
+                        GL_RGB as GLint,
+                        image.width as GLsizei,
+                        image.height as GLsizei,
+                        0, GL_RGB, GL_UNSIGNED_BYTE,
+                        transmute(to_ptr(image.data))
+                    );
                 }
                 
-                None => {
-                    io::println(~"Failed to load texture.");
-                    tex_loaded = false;
-                }
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR as GLint);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR as GLint);
+                
+                tex_loaded = true;
+            }
+            
+            None => {
+                io::println(~"Failed to load texture.");
+                tex_loaded = false;
             }
         }
         
