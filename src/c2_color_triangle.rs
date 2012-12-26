@@ -9,8 +9,6 @@ use vec::raw::to_ptr;
 
 use glcore::*;
 
-fn macros() { include!("macros.rs"); }
-
 fn main() {
     do task::task().sched_mode(task::PlatformThread).spawn {
         if (glfw3::init() == 0) {
@@ -43,11 +41,11 @@ fn main() {
         let vbo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&vbo));
         
-        let vertices = map_cast!([
-             0.0f,  0.5f,   1.0f, 0.0f, 0.0f,
-             0.5f, -0.5f,   0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f,   0.0f, 0.0f, 1.0f
-        ]: GLfloat);
+        let vertices: [GLfloat * 15] = [
+             0.0,  0.5,   1.0, 0.0, 0.0,
+             0.5, -0.5,   0.0, 1.0, 0.0,
+            -0.5, -0.5,   0.0, 0.0, 1.0
+        ];
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         
@@ -119,10 +117,7 @@ fn main() {
             glfw3::poll_events();
             
             // Clear the screen to black
-            glClearColor(0.1 as GLfloat,
-                         0.1 as GLfloat,
-                         0.1 as GLfloat,
-                         1.0 as GLfloat);
+            glClearColor(0.1, 0.1, 0.1, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
         
             // Draw a triangle from the 3 vertices

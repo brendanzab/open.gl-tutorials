@@ -10,8 +10,6 @@ use vec::raw::to_ptr;
 
 use glcore::*;
 
-fn macros() { include!("macros.rs"); }
-
 fn main() {
     do task::task().sched_mode(task::PlatformThread).spawn {
         if (glfw3::init() == 0) {
@@ -44,11 +42,11 @@ fn main() {
         let vbo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&vbo));
         
-        let vertices = map_cast!([
+        let vertices: [GLfloat * 6] = [
              0.0,  0.5,
              0.5, -0.5,
             -0.5, -0.5
-        ]: GLfloat);
+        ];
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         
@@ -111,16 +109,10 @@ fn main() {
             
             // Set the color of the triangle
             let time = glfw3::get_time() as float;
-            glUniform3f(uniColor,
-                        ((sin(time * 4f) + 1f) / 2f) as GLfloat,
-                        0.0 as GLfloat,
-                        0.0 as GLfloat);
+            glUniform3f(uniColor, ((sin(time * 4.0) + 1.0) / 2.0) as GLfloat, 0.0, 0.0);
             
             // Clear the screen to black
-            glClearColor(0.1 as GLfloat,
-                         0.1 as GLfloat,
-                         0.1 as GLfloat,
-                         1.0 as GLfloat);
+            glClearColor(0.1, 0.1, 0.1, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
         
             // Draw a triangle from the 3 vertices

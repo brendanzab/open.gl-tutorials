@@ -11,8 +11,6 @@ use vec::raw::to_ptr;
 use glcore::*;
 use stb_image::image::load_with_depth;
 
-fn macros() { include!("macros.rs"); }
-
 fn main() {
     do task::task().sched_mode(task::PlatformThread).spawn {
         if (glfw3::init() == 0) {
@@ -45,13 +43,13 @@ fn main() {
         let vbo: GLuint = 0;
         glGenBuffers(1, to_unsafe_ptr(&vbo));
         
-        let vertices = map_cast!([
-        //   Position       Color               Texcoords
-            -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Top-left
-             0.5f,  0.5f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Top-right
-             0.5f, -0.5f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f, // Bottom-right
-            -0.5f, -0.5f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f  // Bottom-left
-        ]: GLfloat);
+        let vertices: [GLfloat * 28] = [
+        //   Position     Color            Texcoords
+            -0.5,  0.5,   1.0, 0.0, 0.0,   0.0, 0.0, // Top-left
+             0.5,  0.5,   0.0, 1.0, 0.0,   1.0, 0.0, // Top-right
+             0.5, -0.5,   0.0, 0.0, 1.0,   1.0, 1.0, // Bottom-right
+            -0.5, -0.5,   1.0, 1.0, 1.0,   0.0, 1.0  // Bottom-left
+        ];
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         unsafe {
@@ -137,7 +135,7 @@ fn main() {
         unsafe {
             glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE,
                                   7 * size_of::<GLfloat>() as GLsizei,
-                                  transmute(2 * size_of::<GLfloat>() as uint));
+                                  transmute(2 * size_of::<GLfloat>()));
         }
         
         let texAttrib = glGetAttribLocation(shaderProgram, as_c_str("texcoord", |s| s)) as GLuint;
@@ -145,7 +143,7 @@ fn main() {
         unsafe {
             glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
                                   7 * size_of::<GLfloat>() as GLsizei,
-                                  transmute(5 * size_of::<GLfloat>() as uint));
+                                  transmute(5 * size_of::<GLfloat>()));
         }
 
         // Load textures
@@ -222,10 +220,7 @@ fn main() {
                 glfw3::poll_events();
                 
                 // Clear the screen to black
-                glClearColor(0.1 as GLfloat,
-                             0.1 as GLfloat,
-                             0.1 as GLfloat,
-                             1.0 as GLfloat);
+                glClearColor(0.1, 0.1, 0.1, 1.0);
                 glClear(GL_COLOR_BUFFER_BIT);
             
                 // Draw a rectangle from the 2 triangles using 6 indices
