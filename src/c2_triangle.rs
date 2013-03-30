@@ -1,106 +1,84 @@
-extern mod glfw3;
+extern mod glfw;
 extern mod glcore;
-
-use cast::transmute;
-use ptr::{is_null, null, to_unsafe_ptr};
-use str::as_c_str;
-use sys::size_of;
-use vec::raw::to_ptr;
 
 use glcore::*;
 
+// Vertex data
+static vertices: [GLfloat, ..6] = [
+     0.0,  0.5,
+     0.5, -0.5,
+    -0.5, -0.5
+];
+
+// Shader sources
+static vertex_src: &'static str =
+   "#version 150\n\
+    in vec2 position;\n\
+    void main() {\n\
+       gl_Position = vec4(position, 0.0, 1.0);\n\
+    }";
+
+static fragment_src: &'static str =
+   "#version 150\n\
+    out vec4 outColor;\n\
+    void main() {\n\
+       outColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
+    }";
+            
 fn main() {
-    do task::task().sched_mode(task::PlatformThread).spawn {
-        if (glfw3::init() == 0) {
-            glfw3::terminate();
-            fail(~"glfwInit() failed\n");
-        }
-        
+    do glfw::spawn {
         // Choose a GL profile that is compatible with OS X 10.7+
-        glfw3::window_hint(glfw3::OPENGL_VERSION_MAJOR, 3);
-        glfw3::window_hint(glfw3::OPENGL_VERSION_MINOR, 2);
-        glfw3::window_hint(glfw3::OPENGL_PROFILE, glfw3::OPENGL_CORE_PROFILE);
-        glfw3::window_hint(glfw3::OPENGL_FORWARD_COMPAT, 1);
+        glfw::window_hint(glfw::CONTEXT_VERSION_MAJOR, 3);
+        glfw::window_hint(glfw::CONTEXT_VERSION_MINOR, 2);
+        glfw::window_hint(glfw::OPENGL_PROFILE, glfw::OPENGL_CORE_PROFILE);
+        glfw::window_hint(glfw::OPENGL_FORWARD_COMPAT, 1);
         
-        let mut window = glfw3::create_window(800, 600, glfw3::WINDOWED, ~"OpenGL");
-        
-        if (is_null(window.ptr)) {
-            glfw3::terminate();
-            io::println(~"Error: " + glfw3::error_string(glfw3::get_error()));
-            fail(~"glfwOpenWindow() failed\n");
-        }
+        let window = glfw::Window::create(800, 600, "OpenGL", glfw::Windowed).unwrap();
         
         window.make_context_current();
         
         // Create Vertex Array Object
-        let vao: GLuint = 0;
-        glGenVertexArrays(1, to_unsafe_ptr(&vao));
+        let mut vao: GLuint = 0;
+        glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
         
         // Create a Vertex Buffer Object and copy the vertex data to it
-        let vbo: GLuint = 0;
-        glGenBuffers(1, to_unsafe_ptr(&vbo));
-        
-        let vertices: [GLfloat * 6] = [
-             0.0,  0.5,
-             0.5, -0.5,
-            -0.5, -0.5
-        ];
-        
+        let mut vbo: GLuint = 0;
+        glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        
         unsafe {
             glBufferData(GL_ARRAY_BUFFER,
-                         (vertices.len() * size_of::<GLfloat>()) as GLsizeiptr,
-                         transmute(to_ptr(vertices)),
+                         (vertices.len() * sys::size_of::<GLfloat>()) as GLsizeiptr,
+                         cast::transmute(&vertices[0]),
                          GL_STATIC_DRAW);
         }
-        
-        // Shader sources
-        let vertexSource =
-          ~"#version 150\n\
-            in vec2 position;\n\
-            void main() {\n\
-               gl_Position = vec4(position, 0.0, 1.0);\n\
-            }";
-
-        let fragmentSource =
-          ~"#version 150\n\
-            out vec4 outColor;\n\
-            void main() {\n\
-               outColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
-            }";
 
         // Create and compile the vertex shader
-        let vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        do as_c_str(vertexSource) |data| {
-            glShaderSource(vertexShader, 1, to_unsafe_ptr(&data), null());
-            glCompileShader(vertexShader);
-        }
+        let vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex_shader, 1, &str::as_c_str(vertex_src, |s|s), ptr::null());
+        glCompileShader(vertex_shader);
         
         // Create and compile the fragment shader
-        let fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        do as_c_str(fragmentSource) |data| {
-            glShaderSource(fragmentShader, 1, to_unsafe_ptr(&data), null());
-            glCompileShader(fragmentShader);
-        }
+        let fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment_shader, 1, &str::as_c_str(fragment_src, |s|s), ptr::null());
+        glCompileShader(fragment_shader);
         
         // Link the vertex and fragment shader into a shader program
-        let shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glBindFragDataLocation(shaderProgram, 0, as_c_str("outColor", |s| s));
-        glLinkProgram(shaderProgram);
-        glUseProgram(shaderProgram);
+        let shader_program = glCreateProgram();
+        glAttachShader(shader_program, vertex_shader);
+        glAttachShader(shader_program, fragment_shader);
+        glBindFragDataLocation(shader_program, 0, str::as_c_str("outColor", |s|s));
+        glLinkProgram(shader_program);
+        glUseProgram(shader_program);
         
         // Specify the layout of the vertex data
-        let posAttrib = glGetAttribLocation(shaderProgram, as_c_str("position", |s| s)) as GLuint;
-        glEnableVertexAttribArray(posAttrib);
-        glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, null());
+        let pos_attrib = glGetAttribLocation(shader_program, str::as_c_str("position", |s|s)) as GLuint;
+        glEnableVertexAttribArray(pos_attrib);
+        glVertexAttribPointer(pos_attrib, 2, GL_FLOAT, GL_FALSE, 0, ptr::null());
         
-        while window.get_param(glfw3::CLOSE_REQUESTED) == 0 {
+        while !window.should_close() {
             // Poll events
-            glfw3::poll_events();
+            glfw::poll_events();
             
             // Clear the screen to black
             glClearColor(0.1, 0.1, 0.1, 1.0);
@@ -113,14 +91,12 @@ fn main() {
             window.swap_buffers();
         }
         
-        glDeleteProgram(shaderProgram);
-        glDeleteShader(fragmentShader);
-        glDeleteShader(vertexShader);
+        glDeleteProgram(shader_program);
+        glDeleteShader(fragment_shader);
+        glDeleteShader(vertex_shader);
         
-        glDeleteBuffers(1, to_unsafe_ptr(&vbo));
+        glDeleteBuffers(1, &vbo);
         
-        glDeleteVertexArrays(1, to_unsafe_ptr(&vao));
-        
-        glfw3::terminate();
+        glDeleteVertexArrays(1, &vao);
     }
 }
