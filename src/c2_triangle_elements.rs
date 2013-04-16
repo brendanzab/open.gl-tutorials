@@ -38,10 +38,10 @@ static fragment_src: &'static str =
 fn main() {
     do glfw::spawn {        
         // Choose a GL profile that is compatible with OS X 10.7+
-        glfw::window_hint(glfw::CONTEXT_VERSION_MAJOR, 3);
-        glfw::window_hint(glfw::CONTEXT_VERSION_MINOR, 2);
-        glfw::window_hint(glfw::OPENGL_PROFILE, glfw::OPENGL_CORE_PROFILE);
-        glfw::window_hint(glfw::OPENGL_FORWARD_COMPAT, 1);
+        glfw::window_hint::context_version_major(3);
+        glfw::window_hint::context_version_minor(2);
+        glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
+        glfw::window_hint::opengl_forward_compat(true);
         
         let window = glfw::Window::create(800, 600, "OpenGL", glfw::Windowed).unwrap();
         
